@@ -11,6 +11,16 @@ class BoardTestCase(unittest.TestCase):
 		test_board = board.Board()
 		board_state = test_board.get_board()
 
+	def test_add(self):
+
+		test_board.add(0,0,1)
+		test_board.add(8,8,9)
+		test_board.add(5,5,4)
+
+		self.assertEqual(test_board._board[0][0], 1)
+		self.assertEqual(test_board._board[8][8], 9)
+		self.assertEqual(test_board._board[5][5], 4)
+
 	def test_get_board(self):
 		
 		self.assertEqual(len(board_state), 9)
@@ -79,16 +89,6 @@ class BoardTestCase(unittest.TestCase):
 
 		self.assertEqual(test_board.get_box(1,1), [1,0,0,0,2,0,0,0,3])
 
-	def test_add(self):
-
-		test_board.add(0,0,1)
-		test_board.add(8,8,9)
-		test_board.add(5,5,4)
-
-		self.assertEqual(test_board.get_cell(0,0), 1)
-		self.assertEqual(test_board.get_cell(8,8), 9)
-		self.assertEqual(test_board.get_cell(5,5), 4)
-		
 	def test_clear(self):
 
 		test_board.add(0,0,1)
