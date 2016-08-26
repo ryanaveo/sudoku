@@ -18,7 +18,6 @@ class Board():
 		[0,0,0,0,0,0,0,0,0],
 		[0,0,0,0,0,0,0,0,0]
 		]
-		pass
 
 	def get_board(self):
 		'Returns the current board.'
