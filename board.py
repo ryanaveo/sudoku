@@ -63,6 +63,10 @@ class Board():
 		'Displays the board, defaulting to the current display method.'
 		pass
 
+	def set_board(self, board):
+		'Takes a representation of a board state as input and sets it as the current board state'
+		pass
+
 	def set_display_method(self, display_method):
 		'Sets the current display method.'
 		pass
