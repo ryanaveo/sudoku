@@ -24,11 +24,11 @@ class BoardTestCase(unittest.TestCase):
 		
 		self.assertEqual(len(self._board_state), 9)
 
-		for row in self._board_state:
+		for row in range(len(self._board_state)):
 			self.assertEqual(len(self._board_state[row]), 9)
 
-		for row in self._board_state:
-			for col in self._test_board[row]:
+		for row in range(len(self._board_state)):
+			for col in range(len(self._board_state[row])):
 				self.assertEqual(self._test_board.get_cell(row, col), 0, msg = 'board[{}][{}] should be 0.'.format(row, col))
 
 		self._test_board.add(0,0,9)
