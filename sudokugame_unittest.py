@@ -8,9 +8,8 @@ class BoardTestCase(unittest.TestCase):
 	'Tests for "sudokugame.py"'
 
 	def setUp(self):
-		test_board = board.Board()
-		board_state = test_board.get_board()
-		game = sudokugame.Game()
+		self._test_board = board.Board()
+		self._game = sudokugame.self._game()
 		
 		win_board = [[5,3,4,6,7,8,9,1,2],
 		[6,7,2,1,9,5,3,4,8],
@@ -23,21 +22,21 @@ class BoardTestCase(unittest.TestCase):
 		[3,4,5,2,8,6,1,7,9]]
 
 	def test_valid_move(self):
-		self.assertTrue(game.valid_move(0,0,1))
-		self.assertFalse(game.valid_move(9,9,1))
+		self.assertTrue(self._game.valid_move(0,0,1))
+		self.assertFalse(self._game.valid_move(9,9,1))
 
-		test_board.add(0,0,2)
+		self._test_board.add(0,0,2)
 
-		self.assertFalse(game.valid_move(0,0,1))
+		self.assertFalse(self._game.valid_move(0,0,1))
 
-		self.assertFalse(game.valid_move(0,3,2))
-		self.assertFalse(game.valid_move(5,0,2))
-		self.assertFalse(game.valid_move(2,2,2))
+		self.assertFalse(self._game.valid_move(0,3,2))
+		self.assertFalse(self._game.valid_move(5,0,2))
+		self.assertFalse(self._game.valid_move(2,2,2))
 
 	def test_open_cells(self):
-		self.assertEqual(len(game.open_cells), 81)
+		self.assertEqual(len(self._game.open_cells), 81)
 
-		test_board.set_board([
+		self._test_board.set_board([
 			[1,2,3,4,5,6,7,8,9],
 			[0,0,0,0,0,0,0,0,0],
 			[0,0,0,0,0,0,0,0,0],
@@ -48,8 +47,8 @@ class BoardTestCase(unittest.TestCase):
 			[0,0,0,0,0,0,0,0,0],
 			[0,0,0,0,0,0,0,0,0]])
 
-		self.assertEqual(len(game.open_cells), 72)
-		self.assertEqual(game.open_cells, 
+		self.assertEqual(len(self._game.open_cells), 72)
+		self.assertEqual(self._game.open_cells, 
 			[(1,0),(1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),
 			(2,0),(2,1),(2,2),(2,3),(2,4),(2,5),(2,6),(2,7),(2,8),
 			(3,0),(3,1),(3,2),(3,3),(3,4),(3,5),(3,6),(3,7),(3,8),
@@ -60,26 +59,26 @@ class BoardTestCase(unittest.TestCase):
 			(8,0),(8,1),(8,2),(8,3),(8,4),(8,5),(8,6),(8,7),(8,8)])
 
 	def test_make_move(self):
-		test_board.add(1,1,3)
+		self._test_board.add(1,1,3)
 
-		self.assertRaises(OccupiedCellException, game.make_move(), 1, 1, 1)
-		self.assertRaises(CellOutOfBoundsException, game.make_move(), 9, 9, 1)
-		self.assertRaises(SameRowException, game.make_move(), 1, 2, 3)
-		self.assertRaises(SameColumnException, game.make_move(), 5, 1, 3)
-		self.assertRaises(SameBoxException, game.make_move(), 0, 0, 3)
+		self.assertRaises(OccupiedCellException, self._game.make_move(), 1, 1, 1)
+		self.assertRaises(CellOutOfBoundsException, self._game.make_move(), 9, 9, 1)
+		self.assertRaises(SameRowException, self._game.make_move(), 1, 2, 3)
+		self.assertRaises(SameColumnException, self._game.make_move(), 5, 1, 3)
+		self.assertRaises(SameBoxException, self._game.make_move(), 0, 0, 3)
 
 	def remove(self):
-		game.make_move(1,1,9)
-		self.assertEqual(test_board.get_cell(1,1), 9)
+		self._game.make_move(1,1,9)
+		self.assertEqual(self._test_board.get_cell(1,1), 9)
 
-		game.remove(1,1)
-		self.assertFalse(test_board.get_cell(1,1) == 9)
-		self.assertEqual(test_board.get_cell(1,1), 0)
+		self._game.remove(1,1)
+		self.assertFalse(self._test_board.get_cell(1,1) == 9)
+		self.assertEqual(self._test_board.get_cell(1,1), 0)
 
 	def check_victory(self):
-		self.assertFalse(game.check_victory())
+		self.assertFalse(self._game.check_victory())
 
-		test_board.set_board(win_board)
+		self._test_board.set_board(win_board)
 
-		self.assertTrue(game.check_victory())
+		self.assertTrue(self._game.check_victory())
 
