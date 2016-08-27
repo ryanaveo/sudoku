@@ -69,7 +69,12 @@ class BoardTestCase(unittest.TestCase):
 		self.assertRaises(SameBoxException, game.make_move(), 0, 0, 3)
 
 	def remove(self):
-		
+		game.make_move(1,1,9)
+		self.assertEqual(test_board.get_cell(1,1), 9)
+
+		game.remove(1,1)
+		self.assertFalse(test_board.get_cell(1,1) == 9)
+		self.assertEqual(test_board.get_cell(1,1), 0)
 
 	def check_victory(self):
 		self.assertFalse(game.check_victory())
