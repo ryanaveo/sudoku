@@ -88,19 +88,19 @@ class BoardTestCase(unittest.TestCase):
 
         self.assertEqual(self._test_board.get_box(1,1), [1,0,0,0,2,0,0,0,3])
 
-##  def test_clear(self):
-##
-##      self._test_board.add(0,0,1)
-##      self._test_board.add(8,8,9)
-##      self._test_board.add(5,5,4)
-##
-##      self.assertEqual(self._test_board.clear(0,0), 1)
-##      self.assertEqual(self._test_board.clear(8,8), 9)
-##      self.assertEqual(self._test_board.clear(5,5), 4)
-##
-##      self.assertEqual(self._test_board.get_cell(0,0), 0)
-##      self.assertEqual(self._test_board.get_cell(8,8), 0)
-##      self.assertEqual(self._test_board.get_cell(5,5), 0)
+    def test_clear(self):
+      
+      	self._test_board.add(0,0,1)
+      	self._test_board.add(8,8,9)
+      	self._test_board.add(5,5,4)
+
+      	self.assertEqual(self._test_board.clear(0,0), 1)
+      	self.assertEqual(self._test_board.clear(8,8), 9)
+      	self.assertEqual(self._test_board.clear(5,5), 4)
+
+      	self.assertEqual(self._test_board.get_cell(0,0), 0)
+      	self.assertEqual(self._test_board.get_cell(8,8), 0)
+      	self.assertEqual(self._test_board.get_cell(5,5), 0)
 
     def test_box_indices(self):
 
@@ -120,18 +120,13 @@ class BoardTestCase(unittest.TestCase):
             (2,0),(2,1),(2,2)])
 
     def test_box_bounds(self):
-                self.assertEqual(self._test_board._box_bounds(0,0),
-                                 [(0,2),(0,2)])
+        self.assertEqual(self._test_board._box_bounds(0,0),[(0,2),(0,2)])
 
-                self.assertEqual(self._test_board._box_bounds(4,4),
-                                 [(3,5),(3,5)])
+        self.assertEqual(self._test_board._box_bounds(4,4),[(3,5),(3,5)])
 
-                self.assertEqual(self._test_board._box_bounds(8,8),
-                                 [(6,8),(6,8)])
+        self.assertEqual(self._test_board._box_bounds(8,8),[(6,8),(6,8)])
 
                 
-
-
 
 
 if __name__ == '__main__':
