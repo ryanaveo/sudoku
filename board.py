@@ -50,9 +50,9 @@ class Board():
 		'Returns the values of the 3x3 box that the given cell is a member of.'
 		pass
 
-	def add(self, row: int, column: int, number):
+	def add(self, row: int, column: int, number: int):
 		'Changes the value of a cell to a certain number.'
-		pass
+		self._board[row][column] = number
 
 	def clear(self, row: int, column: int):
 		'Clears the given cell and returns the number that was there.'
