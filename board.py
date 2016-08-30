@@ -21,19 +21,30 @@ class Board():
 
 	def get_board(self):
 		'Returns the current board.'
-		pass
+
+		return self._board
 
 	def get_cell(self, row: int, column: int):
 		'Returns the value of a cell.'
-		pass
+
+		return self._board[row][column]
 
 	def get_row(self, row: int):
 		'Returns the values of a row.'
-		pass
 
+		row_list = []
+		for value in self._board[row]:
+			row_list.append(value)
+
+		return row_list
+		
 	def get_column(self, column: int):
 		'Returns the values of a column.'
-		pass
+
+		col_list = []
+		for row in range(len(self._board)):
+			col_list.append(self._board[row][column])
+		return col_list
 
 	def get_box(self, row: int, column: int):
 		'Returns the values of the 3x3 box that the given cell is a member of.'
