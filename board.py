@@ -60,7 +60,12 @@ class Board():
 
     def clear(self, row: int, column: int):
         'Clears the given cell and returns the number that was there.'
-        pass
+
+        previous_entry = self._board[row][column]
+
+        self._board[row][column] = 0
+        
+        return previous_entry
 
     def to_csv(self, filename):
         'Saves board to a csv file format at the given filename.'
