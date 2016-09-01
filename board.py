@@ -50,7 +50,8 @@ class Board():
         'Returns the values of the 3x3 box that the given cell is a member of.'
         values = []
         for index in self._box_indices(row, column):
-            values.append(self._board[index[0]][index[1]])
+            row_index, column_index = index
+            values.append(self._board[row_index][column_index])
 
         return values
     
@@ -95,9 +96,8 @@ class Board():
         'Returns the indices for all the members of the given 3x3 box.'
         indices = []
 
-        row_bounds = self._box_bounds(row, column)[0]
-        column_bounds = self._box_bounds(row, column)[1]
-
+        row_bounds, column_bounds = self._box_bounds(row, column)
+        
         for row_index in range(row_bounds[0], row_bounds[1] + 1):
 
             row = row_index
