@@ -12,7 +12,7 @@ class BoardTestCase(unittest.TestCase):
         self._empty_board = [[0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0],
-       	[0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0],
@@ -21,15 +21,15 @@ class BoardTestCase(unittest.TestCase):
 
         self._full_board = [[5,3,4,6,7,8,9,1,2],
         [6,7,2,1,9,5,3,4,8],
-		[1,9,8,3,4,2,5,6,7],
-		[8,5,9,7,6,1,4,2,3],
-		[4,2,6,8,5,3,7,9,1],
-		[7,1,3,9,2,4,8,5,6],
-		[9,6,1,5,3,7,2,8,4],
-		[2,8,7,4,1,9,6,3,5],
-		[3,4,5,2,8,6,1,7,9]]
+        [1,9,8,3,4,2,5,6,7],
+        [8,5,9,7,6,1,4,2,3],
+        [4,2,6,8,5,3,7,9,1],
+        [7,1,3,9,2,4,8,5,6],
+        [9,6,1,5,3,7,2,8,4],
+        [2,8,7,4,1,9,6,3,5],
+        [3,4,5,2,8,6,1,7,9]]
 
-		self._test_board = board.Board()
+        self._test_board = board.Board()
         self._board_state = self._test_board.get_board()
 
         self._test_board2 = board.Board()
@@ -115,17 +115,17 @@ class BoardTestCase(unittest.TestCase):
 
     def test_clear(self):
       
-      	self._test_board.add(0,0,1)
-      	self._test_board.add(8,8,9)
-      	self._test_board.add(5,5,4)
+        self._test_board.add(0,0,1)
+        self._test_board.add(8,8,9)
+        self._test_board.add(5,5,4)
 
-      	self.assertEqual(self._test_board.clear(0,0), 1)
-      	self.assertEqual(self._test_board.clear(8,8), 9)
-      	self.assertEqual(self._test_board.clear(5,5), 4)
+        self.assertEqual(self._test_board.clear(0,0), 1)
+        self.assertEqual(self._test_board.clear(8,8), 9)
+        self.assertEqual(self._test_board.clear(5,5), 4)
 
-      	self.assertEqual(self._test_board.get_cell(0,0), 0)
-      	self.assertEqual(self._test_board.get_cell(8,8), 0)
-      	self.assertEqual(self._test_board.get_cell(5,5), 0)
+        self.assertEqual(self._test_board.get_cell(0,0), 0)
+        self.assertEqual(self._test_board.get_cell(8,8), 0)
+        self.assertEqual(self._test_board.get_cell(5,5), 0)
 
     def test_box_indices(self):
 
@@ -152,52 +152,52 @@ class BoardTestCase(unittest.TestCase):
         self.assertEqual(self._test_board._box_bounds(8,8),[(6,8),(6,8)])
 
     def test_to_csv(self):
-    	self._test_board._to_csv('sudoku_test.csv')
-    	with open('sudoku_test.csv', newline='') as csvfile:
-			board = []
-			cells = csv.reader(csvfile)
-			for row in cells:
-				row_values = []
-				for index in range(9):
-					row_values.append(int(row[index]))
-			board.append(row_values)
+        self._test_board.to_csv('sudoku_test.csv')
+        with open('sudoku_test.csv', newline='') as csvfile:
+            board = []
+            cells = csv.reader(csvfile)
+            for row in cells:
+                row_values = []
+                for index in range(9):
+                    row_values.append(int(row[index]))
+                board.append(row_values)
 
-			self.assertEqual(board, self._empty_board)
+            self.assertEqual(board, self._empty_board)
 
-		self._test_board2._to_csv('sudoku_test2.csv')
-		with open('sudoku_test.csv', newline='') as csvfile:
-			board = []
-			cells = csv.reader(csvfile)
-			for row in cells:
-				row_values = []
-				for index in range(9):
-					row_values.append(int(row[index]))
-			board.append(row_values)
+        self._test_board2.to_csv('sudoku_test2.csv')
+        with open('sudoku_test2.csv', newline='') as csvfile:
+            board = []
+            cells = csv.reader(csvfile)
+            for row in cells:
+                row_values = []
+                for index in range(9):
+                    row_values.append(int(row[index]))
+                board.append(row_values)
 
-			self.assertEqual(board, self._full_board)
+            self.assertEqual(board, self._full_board)
 
-		os.remove('sudoku_test.csv')
-		os.remove('sudoku_test2.csv')
+        os.remove('sudoku_test.csv')
+        os.remove('sudoku_test2.csv')
 
-    	
+        
 
     def test_read_csv(self):
-    	self._test_board._to_csv('sudoku_test.csv')
-    	self._test_board2._to_csv('sudoku_test2.csv')
+        self._test_board.to_csv('sudoku_test.csv')
+        self._test_board2.to_csv('sudoku_test2.csv')
 
-    	new_test_board = board.Board()
-    	new_test_board2 = board.Board()
+        new_test_board = board.Board()
+        new_test_board2 = board.Board()
 
-    	new_test_board.read_csv('sudoku_test.csv')
-    	new_test_board2.read_csv('sudoku_test2.csv')
+        new_test_board.read_csv('sudoku_test.csv')
+        new_test_board2.read_csv('sudoku_test2.csv')
 
-    	self.assertEqual(new_test_board.get_board(), self._empty_board)
+        self.assertEqual(new_test_board.get_board(), self._empty_board)
 
-    	self.assertEqual(new_test_board.get_board(), self._full_board)
+        self.assertEqual(new_test_board2.get_board(), self._full_board)
 
-		os.remove('sudoku_test.csv')
-		os.remove('sudoku_test2.csv')
-    	
+        os.remove('sudoku_test.csv')
+        os.remove('sudoku_test2.csv')
+        
 
 
 if __name__ == '__main__':
