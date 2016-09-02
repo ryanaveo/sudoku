@@ -2,6 +2,8 @@
 
 # board.py
 
+import csv
+
 class Board():
     'Class for handling the board state. This class is ignorant of game logic rules.'
 
@@ -70,11 +72,23 @@ class Board():
 
     def to_csv(self, filename):
         'Saves board to a csv file format at the given filename.'
-        pass
+        with open(filename, 'w', newline = '') as csvfile:
+            board = csv.writer(csvfile)
+            board.writerows(self._board)
 
     def read_csv(self, filename):
         'Loads board from the csv file at the given filename.'
-        pass
+        load_board = []
+        with open(filename, 'r', newline = '') as csvfile:
+            board = csv.reader(csvfile)
+            for row in board:
+                row_values = []
+                for index in range(9):
+                    row_values.append(int(row[index]))
+                load_board.append(row_values)
+            self._board = load_board
+
+
 
     def print_board(self):
         'Prints the board.'
@@ -86,7 +100,7 @@ class Board():
 
     def set_board(self, board):
         'Takes a representation of a board state as input and sets it as the current board state'
-        pass
+        self._board = board
 
     def set_display_method(self, display_method):
         'Sets the current display method.'
