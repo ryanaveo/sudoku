@@ -2,6 +2,7 @@
 
 import board
 import csv
+import os
 import unittest
 
 class BoardTestCase(unittest.TestCase):
@@ -175,6 +176,9 @@ class BoardTestCase(unittest.TestCase):
 
 			self.assertEqual(board, self._full_board)
 
+		os.remove('sudoku_test.csv')
+		os.remove('sudoku_test2.csv')
+
     	
 
     def test_read_csv(self):
@@ -191,9 +195,9 @@ class BoardTestCase(unittest.TestCase):
 
     	self.assertEqual(new_test_board.get_board(), self._full_board)
 
-    	pass
-
-    
+		os.remove('sudoku_test.csv')
+		os.remove('sudoku_test2.csv')
+    	
 
 
 if __name__ == '__main__':
