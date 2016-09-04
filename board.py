@@ -92,7 +92,18 @@ class Board():
 
     def print_board(self):
         'Prints the board.'
-        pass
+        for row_index, row_list in enumerate(x.get_board()):
+            row_list = map(str, row_list)
+            row_list = list(row_list)
+            
+            for col_index, row_value in enumerate(row_list):
+                if col_index == 2 or col_index == 5:
+                    row_list[col_index] += ' |'
+                    
+            if row_index == 3 or row_index == 6:
+                print('---------------------')
+
+            print(' '.join(row_list))
 
     def display_board(self, display_method):
         'Displays the board, defaulting to the current display method.'
