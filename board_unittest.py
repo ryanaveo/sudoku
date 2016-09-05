@@ -30,8 +30,7 @@ class BoardTestCase(unittest.TestCase):
         [3,4,5,2,8,6,1,7,9]]
 
         self._test_board = board.Board()
-        self._test_board._state
-
+        
         self._test_board2 = board.Board()
         self._test_board2.set_board(self._full_board)
 

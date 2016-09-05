@@ -5,12 +5,14 @@
 import board
 from collections import namedtuple
 
+Move = namedtuple('Move', 'move_type row col num')
+
 class Game():
 	'''Handles all the game logic and interfaces with the board to execute moves.'''
 
 	def __init__(self):
 		'Starts a new game'
-		self._board = board.Board
+		self._board = board.Board()
 		self._undo_list = []
 		self._redo_list = []
 			
@@ -45,10 +47,10 @@ class Game():
 			last_move = self._undo_list.pop()
 			if last_move.move_type == 'add':
 				self._board.clear(last_move.row, last_move.col)
-				self._redo_list.append(last_move)
 			elif last_move.move_type == 'remove':
 				self._board.add(last_move.row, last_move.col, last_move.number)
-				self._redo_list.append(last_move)
+			
+			self._redo_list.append(last_move)
 
 
 	def redo_move(self):
@@ -60,13 +62,10 @@ class Game():
 			last_undo = self._redo_list.pop()
 			if last_undo.move_type == 'add':
 				self._board.add(last_undo.row, last_undo.col, last_undo.number)
-				self._undo_list.append(last_undo)
 			elif last_undo.move_type == 'remove':
 				self._board.clear(last_undo.row, last_undo.col)
-				self._undo_list.append(last_undo)
-
-
-
+			
+			self._undo_list.append(last_undo)
 
 
 	def remove_number(self, row: int, col: int):
@@ -98,14 +97,9 @@ class Game():
 
 	def _store_move(self, move_type: str, row: int, col: int, number: int):
 		'Creates a Move namedtuple that stores information about the move for undo and redo. Type will be "add" or "remove" depending on what was done'
-		move_info = [move_type, row, col, number]
-
-		move = namedtuple('Move', 'move_type row col number')
-		move = move._make(move_info)
-
+		move = Move(move_type, row, col, number)
+		
 		return move
-
-
 
 	def _validate_move(self, row: int, col: int, number: int):
 		'''
