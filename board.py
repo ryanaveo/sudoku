@@ -9,7 +9,7 @@ class Board():
 
     def __init__(self):
         'Creates a blank 9x9 board and sets the current display_method.'
-        self._board = [
+        self._state = [
         [0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0],
@@ -24,18 +24,18 @@ class Board():
     def get_board(self):
         'Returns the current board.'
 
-        return self._board
+        return self._state
 
     def get_cell(self, row: int, column: int):
         'Returns the value of a cell.'
 
-        return self._board[row][column]
+        return self._state[row][column]
 
     def get_row(self, row: int):
         'Returns the values of a row.'
 
         row_list = []
-        for value in self._board[row]:
+        for value in self._state[row]:
             row_list.append(value)
 
         return row_list
@@ -44,8 +44,8 @@ class Board():
         'Returns the values of a column.'
 
         col_list = []
-        for row in range(len(self._board)):
-            col_list.append(self._board[row][column])
+        for row in range(len(self._state)):
+            col_list.append(self._state[row][column])
         return col_list
 
     def get_box(self, row: int, column: int):
@@ -53,20 +53,20 @@ class Board():
         values = []
         for index in self._box_indices(row, column):
             row_index, column_index = index
-            values.append(self._board[row_index][column_index])
+            values.append(self._state[row_index][column_index])
 
         return values
     
     def add(self, row: int, column: int, number: int):
         'Changes the value of a cell to a certain number.'
-        self._board[row][column] = number
+        self._state[row][column] = number
 
     def clear(self, row: int, column: int):
         'Clears the given cell and returns the number that was there.'
 
-        previous_entry = self._board[row][column]
+        previous_entry = self._state[row][column]
 
-        self._board[row][column] = 0
+        self._state[row][column] = 0
         
         return previous_entry
 
@@ -74,7 +74,7 @@ class Board():
         'Saves board to a csv file format at the given filename.'
         with open(filename, 'w', newline = '') as csvfile:
             board = csv.writer(csvfile)
-            board.writerows(self._board)
+            board.writerows(self._state)
 
     def read_csv(self, filename):
         'Loads board from the csv file at the given filename.'
@@ -86,7 +86,7 @@ class Board():
                 for index in range(9):
                     row_values.append(int(row[index]))
                 load_board.append(row_values)
-            self._board = load_board
+            self._state = load_board
 
 
 
@@ -111,7 +111,7 @@ class Board():
 
     def set_board(self, board):
         'Takes a representation of a board state as input and sets it as the current board state'
-        self._board = board
+        self._state = board
 
     def set_display_method(self, display_method):
         'Sets the current display method.'

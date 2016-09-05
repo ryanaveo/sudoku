@@ -30,7 +30,7 @@ class BoardTestCase(unittest.TestCase):
         [3,4,5,2,8,6,1,7,9]]
 
         self._test_board = board.Board()
-        self._board_state = self._test_board.get_board()
+        self._test_board._state
 
         self._test_board2 = board.Board()
         self._test_board2.set_board(self._full_board)
@@ -47,13 +47,13 @@ class BoardTestCase(unittest.TestCase):
 
     def test_get_board(self):
         
-        self.assertEqual(len(self._board_state), 9)
+        self.assertEqual(len(self._test_board._state), 9)
 
-        for row in range(len(self._board_state)):
-            self.assertEqual(len(self._board_state[row]), 9)
+        for row in range(len(self._test_board._state)):
+            self.assertEqual(len(self._test_board._state[row]), 9)
 
-        for row in range(len(self._board_state)):
-            for col in range(len(self._board_state[row])):
+        for row in range(len(self._test_board._state)):
+            for col in range(len(self._test_board._state[row])):
                 self.assertEqual(self._test_board.get_cell(row, col), 0, msg = 'board[{}][{}] should be 0.'.format(row, col))
 
         self._test_board.add(0,0,9)
