@@ -34,8 +34,8 @@ class GameTestCase(unittest.TestCase):
             [0,0,0,0,0,0,0,0,0],
             [0,0,0,0,0,0,0,0,0]])
 
-        self.assertEqual(len(self._game.open_cells), 72)
-        self.assertEqual(self._game.open_cells, 
+        self.assertEqual(len(self._game.open_cells()), 72)
+        self.assertEqual(self._game.open_cells(), 
             [(1,0),(1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),
             (2,0),(2,1),(2,2),(2,3),(2,4),(2,5),(2,6),(2,7),(2,8),
             (3,0),(3,1),(3,2),(3,3),(3,4),(3,5),(3,6),(3,7),(3,8),

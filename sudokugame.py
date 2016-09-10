@@ -17,16 +17,23 @@ class Game():
         self._redo_list = []
             
     def new_game(self):
-        'Creates a new board to start a new game'
-        pass
+        'resets board to orignial state'
+        for move in range(len(self._undo_list)):
+        	self.undo_move()
 
     def get_board(self):
         'Returns a representation of the game board.'
-        pass
+        return self._board._state
 
     def open_cells(self):
         'Returns a list of the cells that are empty.'
-        pass
+        open_cells_list = []
+        for row in range(len(self._board._state)):
+        	for col in range(len(self._board._state)):
+        		if self._board._state[row][col] == 0:
+        			open_cells_list.append((row, col))
+        return open_cells_list
+
 
     def add_number(self, row: int, col: int, number: int):
         "Executes a move if it's valid. Adds move to undo list and clears redo list"
@@ -89,7 +96,24 @@ class Game():
 
     def check_victory(self) -> bool:
         'Checks the victory conditions have been met.'
-        pass
+        win_entries = [1,2,3,4,5,6,7,8,9]
+
+        for row_index in range(len(self._board._state)):
+        	row_entries = self._board.get_row(row_index)
+        	if not sorted(row_entries) == win_entries:
+        		return False
+
+        for col_index in range(len(self._board._state)):
+        	col_entries = self._board.get_column(col_index)
+        	if not sorted(col_entries) == win_entries:
+        		return False
+
+        for box_coord in [(0, 0), (3, 0), (6, 0), (0, 3), (3, 3), (6, 3), (0, 6), (3, 6), (6, 6)]: 
+        	box_entries = self._board.get_box(box_coord[0], box_coord[1])
+        	if not sorted(box_entries) == win_entries:
+        		return False
+
+        return True
 
     def print_board(self):
         "Prints the board using the board's print_board method"
