@@ -3,6 +3,8 @@
 import sudokugame
 import board
 import unittest
+import os
+import csv
 
 class GameTestCase(unittest.TestCase):
     'Tests for "sudokugame.py"'
@@ -54,38 +56,38 @@ class GameTestCase(unittest.TestCase):
         self.assertEqual(len(self._game._redo_list), 0)
 
     def test_undo_move(self):
-    	self.assertRaises(sudokugame.UndoError, self._game.undo_move)
+        self.assertRaises(sudokugame.UndoError, self._game.undo_move)
 
-    	self._game.add_number(1,1,3)
-    	self._game.undo_move()
+        self._game.add_number(1,1,3)
+        self._game.undo_move()
 
-    	self.assertEqual(self._game._board._state[1][1], 0)
-    	self.assertEqual(self._game._redo_list, [sudokugame.Move(move_type = 'add', row = 1, col = 1, num = 3)])
+        self.assertEqual(self._game._board._state[1][1], 0)
+        self.assertEqual(self._game._redo_list, [sudokugame.Move(move_type = 'add', row = 1, col = 1, num = 3)])
 
-    	self._game.add_number(5,5,4)
-    	self._game.remove_number(5,5)
-    	self._game.undo_move()
+        self._game.add_number(5,5,4)
+        self._game.remove_number(5,5)
+        self._game.undo_move()
 
-    	self.assertEqual(self._game._board._state[5][5], 4)
-    	self.assertEqual(self._game._redo_list, [sudokugame.Move(move_type = 'remove', row = 5, col = 5, num = 4)])
+        self.assertEqual(self._game._board._state[5][5], 4)
+        self.assertEqual(self._game._redo_list, [sudokugame.Move(move_type = 'remove', row = 5, col = 5, num = 4)])
 
     def test_redo_move(self):
-    	self.assertRaises(sudokugame.RedoError, self._game.redo_move)
+        self.assertRaises(sudokugame.RedoError, self._game.redo_move)
 
-    	self._game.add_number(2,2,3)
-    	self._game.undo_move()
-    	self._game.redo_move()
+        self._game.add_number(2,2,3)
+        self._game.undo_move()
+        self._game.redo_move()
 
-    	self.assertEqual(self._game._board._state[2][2], 3)
-    	self.assertEqual(self._game._undo_list, [sudokugame.Move(move_type = 'add', row = 2, col = 2, num = 3)])
+        self.assertEqual(self._game._board._state[2][2], 3)
+        self.assertEqual(self._game._undo_list, [sudokugame.Move(move_type = 'add', row = 2, col = 2, num = 3)])
 
-    	self._game.add_number(8,8,5)
-    	self._game.remove_number(8,8)
-    	self._game.undo_move()
-    	self._game.redo_move()
+        self._game.add_number(8,8,5)
+        self._game.remove_number(8,8)
+        self._game.undo_move()
+        self._game.redo_move()
 
-    	self.assertEqual(self._game._board._state[8][8], 0)
-    	self.assertEqual(self._game._undo_list, [sudokugame.Move(move_type='add', row=2, col=2, num=3), sudokugame.Move(move_type='add', row=8, col=8, num=5), sudokugame.Move(move_type='remove', row=8, col=8, num=5)])
+        self.assertEqual(self._game._board._state[8][8], 0)
+        self.assertEqual(self._game._undo_list, [sudokugame.Move(move_type='add', row=2, col=2, num=3), sudokugame.Move(move_type='add', row=8, col=8, num=5), sudokugame.Move(move_type='remove', row=8, col=8, num=5)])
 
     def test_remove_number(self):
         self._game.add_number(1,1,9)
@@ -104,6 +106,41 @@ class GameTestCase(unittest.TestCase):
         self._game._board.set_board(self._win_board)
 
         self.assertTrue(self._game.check_victory())
+
+    def test_save_state(self):
+        self._game._board.set_board(self._win_board)
+        self._game.save_state('test_game')
+        self.assertTrue(os.path.isfile('test_game.csv'))
+
+        with open('test_game.csv', newline='') as csvfile:
+            board = []
+            cells = csv.reader(csvfile)
+            for row in cells:
+                row_values = []
+                for index in range(9):
+                    row_values.append(int(row[index]))
+                board.append(row_values)
+
+            self.assertEqual(board, self._game._board._state)
+
+        os.remove('test_game.csv')
+
+    def test_load_state(self):
+        self._game.load_state('test_game')
+
+        with open('test_game.csv', newline='') as csvfile:
+            board = []
+            cells = csv.reader(csvfile)
+            for row in cells:
+                row_values = []
+                for index in range(9):
+                    row_values.append(int(row[index]))
+                board.append(row_values)
+
+            self.assertEqual(board, self._game._board._state)
+
+        os.remove('test_game.csv')
+
 
     def test_validate_move(self):
         self._game._board.add(0,1,2)

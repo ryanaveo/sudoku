@@ -88,11 +88,12 @@ class Game():
         Saves the current state. Uses state_name to name the csv file in
         the board's to_csv call. 
         '''
-        pass
+        self._board.to_csv(state_name + '.csv')
+
 
     def load_state(self, state_name: str='save'):
         'Loads a board state'
-        pass
+        self._board.read_csv(state_name + '.csv')
 
     def check_victory(self) -> bool:
         'Checks the victory conditions have been met.'
