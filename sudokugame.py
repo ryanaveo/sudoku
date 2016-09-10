@@ -118,7 +118,7 @@ class Game():
 
     def print_board(self):
         "Prints the board using the board's print_board method"
-        pass
+        self._board.print_board()
 
     def _store_move(self, move_type: str, row: int, col: int, number: int):
         'Creates a Move namedtuple that stores information about the move for undo and redo. Type will be "add" or "remove" depending on what was done'

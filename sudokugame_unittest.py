@@ -126,6 +126,7 @@ class GameTestCase(unittest.TestCase):
         os.remove('test_game.csv')
 
     def test_load_state(self):
+        self._game.save_state('test_game')
         self._game.load_state('test_game')
 
         with open('test_game.csv', newline='') as csvfile:
@@ -141,6 +142,8 @@ class GameTestCase(unittest.TestCase):
 
         os.remove('test_game.csv')
 
+    def test_store_move(self):
+        self.assertEqual(self._game._store_move('add', 1, 1, 2), sudokugame.Move(move_type = 'add', row = 1, col = 1, num = 2))
 
     def test_validate_move(self):
         self._game._board.add(0,1,2)
@@ -154,5 +157,44 @@ class GameTestCase(unittest.TestCase):
         self.assertRaises(sudokugame.InvalidNumberError, self._game._validate_move, 4, 4, -5)
         self.assertRaises(sudokugame.InvalidNumberError, self._game._validate_move, 4, 4, 0)
         self.assertRaises(sudokugame.InvalidNumberError, self._game._validate_move, 4, 4, 10)
+
+    def test_cell_is_occupied(self):
+        self.assertFalse(self._game._cell_is_occupied(0,0))
+        self._game._board.add(0,0,1)
+        self.assertTrue(self._game._cell_is_occupied(0,0))
+
+    def test_cell_in_bounds(self):
+        self.assertFalse(self._game._cell_in_bounds(-1, 3))
+        self.assertFalse(self._game._cell_in_bounds(3, -1))
+        self.assertFalse(self._game._cell_in_bounds(-10, -9))
+        self.assertFalse(self._game._cell_in_bounds(9, 9))
+        self.assertFalse(self._game._cell_in_bounds(3, 9))
+
+        self.assertTrue(self._game._cell_in_bounds(4,4))
+
+
+    def test_same_num_in_row(self):
+        self.assertFalse(self._game._same_num_in_row(1,1))
+        self._game._board.add(1,0,1)
+        self.assertTrue(self._game._same_num_in_row(1,1))
+
+    def test_same_num_in_col(self):
+        self.assertFalse(self._game._same_num_in_col(1,1))
+        self._game._board.add(0,1,1)
+        self.assertTrue(self._game._same_num_in_col(1,1))
+
+    def test_same_num_in_box(self):
+        self.assertFalse(self._game._same_num_in_box(1,1,2))
+        self._game._board.add(0,0,2)
+        self.assertTrue(self._game._same_num_in_box(1,1,2))
+
+    def test_valid_number(self):
+        self.assertFalse(self._game._valid_number(0))
+        self.assertFalse(self._game._valid_number(-10))
+        self.assertFalse(self._game._valid_number(10))
+        self.assertTrue(self._game._valid_number(9))
+        self.assertTrue(self._game._valid_number(4))
+        self.assertTrue(self._game._valid_number(1))
+
 if __name__ == '__main__':
     unittest.main()
