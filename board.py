@@ -92,7 +92,7 @@ class Board():
 
     def print_board(self):
         'Prints the board.'
-        for row_index, row_list in enumerate(x.get_board()):
+        for row_index, row_list in enumerate(self.get_board()):
             row_list = map(str, row_list)
             row_list = list(row_list)
             

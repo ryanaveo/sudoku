@@ -4,8 +4,17 @@
 
 import board
 from collections import namedtuple
+import os
+import prompt
 
 Move = namedtuple('Move', 'move_type row col num')
+CONTROLS = '''
+CONTROLS
+a: add a number
+r: remove a number
+<: undo move
+>: redo move
+'''
 
 class Game():
     '''Handles all the game logic and interfaces with the board to execute moves.'''
@@ -19,7 +28,7 @@ class Game():
     def new_game(self):
         'resets board to orignial state'
         for move in range(len(self._undo_list)):
-        	self.undo_move()
+            self.undo_move()
 
     def get_board(self):
         'Returns a representation of the game board.'
@@ -29,9 +38,9 @@ class Game():
         'Returns a list of the cells that are empty.'
         open_cells_list = []
         for row in range(len(self._board._state)):
-        	for col in range(len(self._board._state)):
-        		if self._board._state[row][col] == 0:
-        			open_cells_list.append((row, col))
+            for col in range(len(self._board._state)):
+                if self._board._state[row][col] == 0:
+                    open_cells_list.append((row, col))
         return open_cells_list
 
 
@@ -134,27 +143,27 @@ class Game():
             (2) Cell is not occupied
             (3) The move doesn't have any of the same entry in the same column, row, or box.
             (4) The number is valid (1-9)
-        '''
-        if number == 0:
-                        raise InvalidNumberError
-                
-        elif self._cell_is_occupied(row, col):
-            raise OccupiedCellError
-
+        '''                
+        
+        if not self._valid_number(number):
+            raise InvalidNumberError(number)
+        
         elif not self._cell_in_bounds(row, col):
-            raise CellOutOfBoundsError
+            raise CellOutOfBoundsError(row, col)
+        
+        elif self._cell_is_occupied(row, col):
+            raise OccupiedCellError(row, col, self._board.get_cell(row,col))
 
         elif self._same_num_in_row(row, number):
-            raise SameRowError
-
+            col_of_repeater = self._board.get_row(row).index(number)
+            raise SameRowError(col, col_of_repeater, row, number)
+        
         elif self._same_num_in_col(col, number):
-            raise SameColumnError
+            row_of_repeater = self._board.get_column(col).index(number)
+            raise SameColumnError(row, row_of_repeater, col, number)
         
         elif self._same_num_in_box(row, col, number):
-            raise SameBoxError
-
-        elif not self._valid_number(number):
-            raise InvalidNumberError
+            raise SameBoxError(row, col, number)
 
     def _cell_is_occupied(self, row: int, col: int):
         'Returns a bool that indicates if a cell is occupied'
@@ -184,34 +193,91 @@ class Game():
 
         return 1 <= number <= 9
 
+#EXCEPTIONS
+
 class OccupiedCellError(Exception):
     'Exception for trying to make a move on an occupied cell.'
-    pass
+    def __init__(self, row, column, cell_value):
+        message = 'OccupiedCellError: ({}, {}) is already occupied by the number {}.'
+        super().__init__(message.format(row, column, cell_value))
 
 class CellOutOfBoundsError(Exception):
     'Exception for giving coordinates that are outside of the board.'
-    pass
+    def __init__(self, row, column):
+        message = 'CellOutOfBoundsError: ({}, {}) is out of bounds. Rows and Columns must be from 0-8.'
+        super().__init__(message.format(row, column))
 
 class SameRowError(Exception):
     'Exception for moves whose numbers have already been seen in the same row.'
-    pass
+    def __init__(self, col_of_move, col_of_repeater, row, number):
+        message = 'SameRowError: ({}, {}) is in the same row as your move ({}, {}) and already contains the number {}.'
+        super().__init__(message.format(row, col_of_repeater, row, col_of_move, number))
 
 class SameColumnError(Exception):
     'Exception for moves whose numbers have already been seen in the same column.'
-    pass
+    def __init__(self, row_of_move, row_of_repeater, column, number):
+        message = 'SameColumnError: ({}, {}) is in the same column as your move ({}, {}) and already contains the number {}.'
+        super().__init__(message.format(row_of_repeater, column, row_of_move, column, number))
 
 class SameBoxError(Exception):
     'Exception for moves whose numbers have already been seen in the same box.'
-    pass
+    def __init__(self, row, col, number):
+        message = 'SameBoxError: The box that contains your move ({}, {}) already contains the number {}.'
+        super().__init__(message.format(row, col, number))
 
 class InvalidNumberError(Exception):
     'Exception for attempts to place an invalid number (any number not 1-9) in a cell'
-    pass
+    def __init__(self, number):
+        message = '{} is not a valid number. Please enter a number from 1-9.'
+        super().__init__(message.format(number))
 
 class UndoError(Exception):
     'Exception for attempts to undo when there are no moves to undo'
-    pass
+    def __init__(self):
+        super().__init__('UndoError: No moves available to undo')
 
 class RedoError(Exception):
     'Exception for attempts to redo when there are no moves to redo'
-    pass
+    def __init__(self):
+        super().__init__('RedoError: No moves available to redo')
+
+if __name__ == '__main__':
+    turn = 0
+
+    game = Game()
+    sudoku_pack = prompt.for_string('Choose the sudoku pack you want to use ',
+                                    default='0', error_message='Not a valid sudoku pack.')
+    sudoku_number = prompt.for_int('Choose the sudoku number you want to use ',
+                                   default=0,error_message='Not a valid sudoku game in the pack.')
+    game.load_state(os.path.join('sudoku_states', '{}_{:05d}'.format(sudoku_pack, sudoku_number)))
+
+    print(CONTROLS)
+    while True:
+        try:
+            print('TURN: {}'.format(turn))
+            game.print_board()
+            if game.check_victory():
+                print('All cells filled! You win!')
+                break
+            else:
+                move_type = prompt.for_string('Choose your move')
+                if move_type == 'a':
+                    cell = prompt.for_string('Enter cell coordinates and number to add (e.g. row 0 column 1 for number 3 = 0 1 3)')
+                    row, col, num = cell.split()
+                    game.add_number(int(row),int(col),int(num))
+                    turn += 1
+                elif move_type == 'r':
+                    cell = prompt.for_string('Enter cell coordinates to remove (e.g. row 0 column 1 = 0 1)')
+                    row, col, num = cell.split()
+                    game.remove_number(int(row),int(col))
+                    turn += 1
+                elif move_type == '<':
+                    game.undo_move()
+                    turn += 1
+                elif move_type == '>':
+                    game.redo_move()
+                    turn += 1
+                else:
+                    print('Not a valid move')
+        except Exception as inst:
+            print(inst)
