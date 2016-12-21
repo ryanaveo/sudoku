@@ -6,11 +6,13 @@ import board
 from collections import namedtuple
 import os
 import prompt
+from tkinter.tix import ROW
 
-Move = namedtuple('Move', 'move_type row col num')
+
 CONTROLS = '''
 CONTROLS
 a: add a number
+c: change a number
 r: remove a number
 <: undo move
 >: redo move
@@ -47,44 +49,26 @@ class Game():
 
     def add_number(self, row: int, col: int, number: int):
         "Executes a move if it's valid. Adds move to undo list and clears redo list"
-        self._validate_move(row, col, number)
+        self._validate_move('a', row, col, number)
         self._board.add(row, col, number)
 
-        move = self._store_move('add', row, col, number)
-        self._undo_list.append(move)
+        action = Add(row, col, number)
+        self._undo_list.append(action)
         self._redo_list = []
-
-
-    def undo_move(self):
-        'Undoes the last move if there are any. Otherwise raises exception.'
-        if len(self._undo_list) == 0:
-            raise UndoError
-
-        else:
-            last_move = self._undo_list.pop()
-            if last_move.move_type == 'add':
-                self._board.clear(last_move.row, last_move.col)
-            elif last_move.move_type == 'remove':
-                self._board.add(last_move.row, last_move.col, last_move.num)
-            
-            self._redo_list.append(last_move)
-
-
-    def redo_move(self):
-        'Redoes the last undo if there are any. Otherwise raises exception.'
-        if len(self._redo_list) == 0:
-            raise RedoError
-
-        else:
-            last_undo = self._redo_list.pop()
-            if last_undo.move_type == 'add':
-                self._board.add(last_undo.row, last_undo.col, last_undo.num)
-            elif last_undo.move_type == 'remove':
-                self._board.clear(last_undo.row, last_undo.col)
-            
-            self._undo_list.append(last_undo)
-
-
+    
+    def change_number(self, row: int, col: int, new_num: int):
+        "Allows a cell that is not zero to be changed to a new number if the cell is non-permanent. Executes change if move is valid"
+        if self._permanency[row][col] == True:
+            raise PermanencyError(row,col)
+        
+        self._validate_move('c', row, col, new_num)
+        
+        old_num = self._board.clear(row, col)
+        self._board._state[row][col] = new_num
+        action = Change(row, col, old_num, new_num)
+        self._undo_list.append(action)
+        self._redo_list = []
+        
     def remove_number(self, row: int, col: int):
         "Remove a number from the given cell"
         if self._permanency[row][col] == True:
@@ -94,6 +78,33 @@ class Game():
         
         self._undo_list.append(move)
         self._redo_list = []
+
+    def undo_move(self):
+        'Undoes the last move if there are any. Otherwise raises exception.'
+        if len(self._undo_list) == 0:
+            raise UndoError
+
+        else:
+            last_action = self._undo_list.pop()
+            number = last_action.get_old_num()
+            row, col = last_action.get_coordinates()
+            self._board._state[row][col] = number
+            
+            self._redo_list.append(last_action)
+
+
+    def redo_move(self):
+        'Redoes the last undo if there are any. Otherwise raises exception.'
+        if len(self._redo_list) == 0:
+            raise RedoError
+
+        else:
+            last_undo = self._redo_list.pop()
+            number = last_undo.get_new_num()
+            row, col = last_undo.get_coordinates()
+            self._board._state[row][col] = number
+            
+            self._undo_list.append(last_undo)
 
     def save_state(self, state_name: str='save'):
         '''
@@ -145,7 +156,7 @@ class Game():
         
         return move
 
-    def _validate_move(self, row: int, col: int, number: int):
+    def _validate_move(self, type: str, row: int, col: int, number: int):
         '''
         Raises an exception if the given move is valid on the board.
         Needs to check:
@@ -154,26 +165,44 @@ class Game():
             (3) The move doesn't have any of the same entry in the same column, row, or box.
             (4) The number is valid (1-9)
         '''                
-        
-        if not self._valid_number(number):
-            raise InvalidNumberError(number)
-        
-        elif not self._cell_in_bounds(row, col):
-            raise CellOutOfBoundsError(row, col)
-        
-        elif self._cell_is_occupied(row, col):
-            raise OccupiedCellError(row, col, self._board.get_cell(row,col))
-
-        elif self._same_num_in_row(row, number):
-            col_of_repeater = self._board.get_row(row).index(number)
-            raise SameRowError(col, col_of_repeater, row, number)
-        
-        elif self._same_num_in_col(col, number):
-            row_of_repeater = self._board.get_column(col).index(number)
-            raise SameColumnError(row, row_of_repeater, col, number)
-        
-        elif self._same_num_in_box(row, col, number):
-            raise SameBoxError(row, col, number)
+        if type in ['a', 'r']:
+            if not self._valid_number(number):
+                raise InvalidNumberError(number)
+            
+            elif not self._cell_in_bounds(row, col):
+                raise CellOutOfBoundsError(row, col)
+            
+            elif self._cell_is_occupied(row, col):
+                raise OccupiedCellError(row, col, self._board.get_cell(row,col))
+    
+            elif self._same_num_in_row(row, number):
+                col_of_repeater = self._board.get_row(row).index(number)
+                raise SameRowError(col, col_of_repeater, row, number)
+            
+            elif self._same_num_in_col(col, number):
+                row_of_repeater = self._board.get_column(col).index(number)
+                raise SameColumnError(row, row_of_repeater, col, number)
+            
+            elif self._same_num_in_box(row, col, number):
+                raise SameBoxError(row, col, number)
+        elif type == 'c':
+            'Move is valid if cell is occupied'
+            if not self._valid_number(number):
+                raise InvalidNumberError(number)
+            
+            elif not self._cell_in_bounds(row, col):
+                raise CellOutOfBoundsError(row, col)
+            
+            elif self._same_num_in_row(row, number):
+                col_of_repeater = self._board.get_row(row).index(number)
+                raise SameRowError(col, col_of_repeater, row, number)
+            
+            elif self._same_num_in_col(col, number):
+                row_of_repeater = self._board.get_column(col).index(number)
+                raise SameColumnError(row, row_of_repeater, col, number)
+            
+            elif self._same_num_in_box(row, col, number):
+                raise SameBoxError(row, col, number)
 
     def _cell_is_occupied(self, row: int, col: int):
         'Returns a bool that indicates if a cell is occupied'
@@ -202,6 +231,49 @@ class Game():
         'Returns a bool that indicates if the given number is valid'
 
         return 1 <= number <= 9
+
+#ACTION OBJECTS
+
+class Action:
+    'Base class for all actions made in the game. Stores row, col, and num of action'
+    
+    def __init__(self, row, col):
+        self._row = row
+        self._col = col
+    
+    def get_coordinates(self):
+        return self._row, self._col
+    
+    def get_old_num(self):
+        return self._old_num
+    
+    def get_new_num(self):
+        return self._new_num
+    
+    
+class Add(Action):
+    'Class for adding a number'
+    
+    def __init__(self, row, col, num):
+        Action.__init__(self, row, col)
+        self._new_num = num
+        self._old_num = 0
+    
+class Remove(Action):
+    'Class for removing a number'
+    
+    def __init__(self, row, col, old_num):
+        Action.__init__(self, row, col)
+        self._new_num = 0
+        self._old_num = old_num 
+
+class Change(Action):
+    'Class for changing a non-permanent cell to a new number'
+    
+    def __init__(self, row, col, old_num, new_num):
+        Action.__init__(self, row, col)
+        self._old_num = old_num
+        self._new_num = new_num
 
 #EXCEPTIONS
 
@@ -256,6 +328,11 @@ class PermanencyError(Exception):
     def __init__(self, row, column):
         super().__init__('PermanencyError: Unable to remove the cell. ({}, {}) is permanent in the game.'.format(row,column))
 
+
+
+
+
+
 if __name__ == '__main__':
     turn = 0
 
@@ -278,14 +355,19 @@ if __name__ == '__main__':
             else:
                 move_type = prompt.for_string('Choose your move')
                 if move_type == 'a':
-                    cell = prompt.for_string('Enter cell coordinates and number to add (e.g. row 0 column 1 for number 3 = 0 1 3)')
+                    cell = prompt.for_string('Enter move (e.g. add 3 to row 0 column 1 = 0 1 3)')
                     row, col, num = cell.split()
                     game.add_number(int(row),int(col),int(num))
                     turn += 1
                 elif move_type == 'r':
-                    cell = prompt.for_string('Enter cell coordinates to remove (e.g. row 0 column 1 = 0 1)')
+                    cell = prompt.for_string('Enter move (e.g. remove row 0 column 1 = 0 1)')
                     row, col = cell.split()
                     game.remove_number(int(row),int(col))
+                    turn += 1
+                elif move_type == 'c':
+                    cell = prompt.for_string('Enter move (e.g. change row 0 column 1 to number 3 = 0 1 3)')
+                    row, col, num = cell.split()
+                    game.change_number(int(row), int(col), int(num))
                     turn += 1
                 elif move_type == '<':
                     game.undo_move()
