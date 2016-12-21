@@ -24,6 +24,7 @@ class Game():
         self._board = board.Board()
         self._undo_list = []
         self._redo_list = []
+        self._permanency = [[False,False,False,False,False,False,False,False,False] for row in range(9)]
             
     def new_game(self):
         'resets board to orignial state'
@@ -86,6 +87,8 @@ class Game():
 
     def remove_number(self, row: int, col: int):
         "Remove a number from the given cell"
+        if self._permanency[row][col] == True:
+            raise PermanencyError(row,col)
         number = self._board.clear(row, col)
         move = self._store_move('remove', row, col, number)
         
@@ -128,7 +131,14 @@ class Game():
     def print_board(self):
         "Prints the board using the board's print_board method"
         self._board.print_board()
-
+    
+    def set_permanency(self):
+        "Returns an array of bool values that indicate whether a cell can't be removed. True if cell can't be removed"
+        for row in range(len(self._board._state)):
+            for col in range(len(self._board._state)):
+                if self._board._state[row][col] != 0:
+                    self._permanency[row][col] = True
+    
     def _store_move(self, move_type: str, row: int, col: int, number: int):
         'Creates a Move namedtuple that stores information about the move for undo and redo. Type will be "add" or "remove" depending on what was done'
         move = Move(move_type, row, col, number)
@@ -241,6 +251,11 @@ class RedoError(Exception):
     def __init__(self):
         super().__init__('RedoError: No moves available to redo')
 
+class PermanencyError(Exception):
+    'Exception for attempts to remove a number that is permanent in the game'
+    def __init__(self, row, column):
+        super().__init__('PermanencyError: Unable to remove the cell. ({}, {}) is permanent in the game.'.format(row,column))
+
 if __name__ == '__main__':
     turn = 0
 
@@ -250,6 +265,7 @@ if __name__ == '__main__':
     sudoku_number = prompt.for_int('Choose the sudoku number you want to use ',
                                    default=0,error_message='Not a valid sudoku game in the pack.')
     game.load_state(os.path.join('sudoku_states', '{}_{:05d}'.format(sudoku_pack, sudoku_number)))
+    game.set_permanency()
 
     print(CONTROLS)
     while True:
@@ -268,7 +284,7 @@ if __name__ == '__main__':
                     turn += 1
                 elif move_type == 'r':
                     cell = prompt.for_string('Enter cell coordinates to remove (e.g. row 0 column 1 = 0 1)')
-                    row, col, num = cell.split()
+                    row, col = cell.split()
                     game.remove_number(int(row),int(col))
                     turn += 1
                 elif move_type == '<':
