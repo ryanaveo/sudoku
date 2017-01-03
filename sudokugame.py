@@ -22,15 +22,15 @@ class Game():
     '''Handles all the game logic and interfaces with the board to execute moves.'''
 
     def __init__(self):
-        'Starts a new game'
+        'Starts a new game by initializing a Board object, an undo list, a redo list, and a list of permanent cells'
         self._board = board.Board()
         self._undo_list = []
         self._redo_list = []
         self._permanency = [[False,False,False,False,False,False,False,False,False] for row in range(9)]
             
     def new_game(self):
-        'resets board to orignial state'
-        for move in range(len(self._undo_list)):
+        'resets board to original state'
+        for move in range(len(self._undo_list)):  # @UnusedVariable
             self.undo_move()
 
     def get_board(self):
@@ -47,29 +47,29 @@ class Game():
         return open_cells_list
 
 
-    def add_number(self, row: int, col: int, number: int):
+    def add_number(self, row, col, num):
         "Executes a move if it's valid. Adds move to undo list and clears redo list"
-        self._validate_move('a', row, col, number)
-        self._board.add(row, col, number)
+        self._validate_move('a', row, col, num)
+        self._board.add(row, col, num)
 
-        action = Add(row, col, number)
+        action = Add(row, col, num)
         self._undo_list.append(action)
         self._redo_list = []
     
-    def change_number(self, row: int, col: int, new_num: int):
+    def change_number(self, row, col, new_num):
         "Allows a cell that is not zero to be changed to a new number if the cell is non-permanent. Executes change if move is valid"
         if self._permanency[row][col] == True:
             raise PermanencyError(row,col)
         
-        self._validate_move('c', row, col, new_num)
+        self._validate_move('c', row, col, new_num)  # @UndefinedVariable
         
         old_num = self._board.clear(row, col)
-        self._board._state[row][col] = new_num
-        action = Change(row, col, old_num, new_num)
+        self._board._state[row][col] = new_num  # @UndefinedVariable
+        action = Change(row, col, old_num, new_num)  # @UndefinedVariable
         self._undo_list.append(action)
         self._redo_list = []
         
-    def remove_number(self, row: int, col: int):
+    def remove_number(self, row, col):
         "Remove a number from the given cell"
         if self._permanency[row][col] == True:
             raise PermanencyError(row,col)
@@ -113,7 +113,6 @@ class Game():
         '''
         self._board.to_csv(state_name + '.csv')
 
-
     def load_state(self, state_name: str='save'):
         'Loads a board state'
         self._board.read_csv(state_name + '.csv')
@@ -123,19 +122,19 @@ class Game():
         win_entries = [1,2,3,4,5,6,7,8,9]
 
         for row_index in range(len(self._board._state)):
-        	row_entries = self._board.get_row(row_index)
-        	if not sorted(row_entries) == win_entries:
-        		return False
+            row_entries = self._board.get_row(row_index)
+            if not sorted(row_entries) == win_entries:
+                return False
 
         for col_index in range(len(self._board._state)):
-        	col_entries = self._board.get_column(col_index)
-        	if not sorted(col_entries) == win_entries:
-        		return False
+            col_entries = self._board.get_column(col_index)
+            if not sorted(col_entries) == win_entries:
+                return False
 
-        for box_coord in [(0, 0), (3, 0), (6, 0), (0, 3), (3, 3), (6, 3), (0, 6), (3, 6), (6, 6)]: 
-        	box_entries = self._board.get_box(box_coord[0], box_coord[1])
-        	if not sorted(box_entries) == win_entries:
-        		return False
+        for box_coord in [(0, 0), (3, 0), (6, 0), (0, 3), (3, 3), (6, 3), (0, 6), (3, 6), (6, 6)]:
+            box_entries = self._board.get_box(box_coord[0], box_coord[1])
+            if not sorted(box_entries) == win_entries:
+                return False
 
         return True
 
@@ -150,13 +149,7 @@ class Game():
                 if self._board._state[row][col] != 0:
                     self._permanency[row][col] = True
     
-    def _store_move(self, move_type: str, row: int, col: int, number: int):
-        'Creates a Move namedtuple that stores information about the move for undo and redo. Type will be "add" or "remove" depending on what was done'
-        move = Move(move_type, row, col, number)
-        
-        return move
-
-    def _validate_move(self, type: str, row: int, col: int, number: int):
+    def _validate_move(self, move_type: str, row: int, col: int, num: int):
         '''
         Raises an exception if the given move is valid on the board.
         Needs to check:
@@ -165,9 +158,9 @@ class Game():
             (3) The move doesn't have any of the same entry in the same column, row, or box.
             (4) The number is valid (1-9)
         '''                
-        if type in ['a', 'r']:
-            if not self._valid_number(number):
-                raise InvalidNumberError(number)
+        if move_type in ['a', 'r']:
+            if not self._valid_number(num):
+                raise InvalidNumberError(num)
             
             elif not self._cell_in_bounds(row, col):
                 raise CellOutOfBoundsError(row, col)
@@ -175,34 +168,35 @@ class Game():
             elif self._cell_is_occupied(row, col):
                 raise OccupiedCellError(row, col, self._board.get_cell(row,col))
     
-            elif self._same_num_in_row(row, number):
-                col_of_repeater = self._board.get_row(row).index(number)
-                raise SameRowError(col, col_of_repeater, row, number)
+            elif self._same_num_in_row(row, num):
+                col_of_repeater = self._board.get_row(row).index(num)
+                raise SameRowError(col, col_of_repeater, row, num)
             
-            elif self._same_num_in_col(col, number):
-                row_of_repeater = self._board.get_column(col).index(number)
-                raise SameColumnError(row, row_of_repeater, col, number)
+            elif self._same_num_in_col(col, num):
+                row_of_repeater = self._board.get_column(col).index(num)
+                raise SameColumnError(row, row_of_repeater, col, num)
             
-            elif self._same_num_in_box(row, col, number):
-                raise SameBoxError(row, col, number)
-        elif type == 'c':
-            'Move is valid if cell is occupied'
-            if not self._valid_number(number):
-                raise InvalidNumberError(number)
+            elif self._same_num_in_box(row, col, num):
+                raise SameBoxError(row, col, num)
+        
+        elif move_type == 'c':
+            #Move is valid even if cell is occupied so it doesn't check for cell occupation
+            if not self._valid_number(num):
+                raise InvalidNumberError(num)
             
             elif not self._cell_in_bounds(row, col):
                 raise CellOutOfBoundsError(row, col)
             
-            elif self._same_num_in_row(row, number):
-                col_of_repeater = self._board.get_row(row).index(number)
-                raise SameRowError(col, col_of_repeater, row, number)
+            elif self._same_num_in_row(row, num):
+                col_of_repeater = self._board.get_row(row).index(num)
+                raise SameRowError(col, col_of_repeater, row, num)
             
-            elif self._same_num_in_col(col, number):
-                row_of_repeater = self._board.get_column(col).index(number)
-                raise SameColumnError(row, row_of_repeater, col, number)
+            elif self._same_num_in_col(col, num):
+                row_of_repeater = self._board.get_column(col).index(num)
+                raise SameColumnError(row, row_of_repeater, col, num)
             
-            elif self._same_num_in_box(row, col, number):
-                raise SameBoxError(row, col, number)
+            elif self._same_num_in_box(row, col, num):
+                raise SameBoxError(row, col, num)
 
     def _cell_is_occupied(self, row: int, col: int):
         'Returns a bool that indicates if a cell is occupied'
@@ -213,19 +207,17 @@ class Game():
 
         return (0 <= row <= 8) and (0 <= col <= 8)
 
-    def _same_num_in_row(self, row: int, number: int):
+    def _same_num_in_row(self, row: int, num: int):
         'Returns a bool that indicates if the given number is already in the given row'
-        return number in self._board.get_row(row)
+        return num in self._board.get_row(row)
 
-    def _same_num_in_col(self, col: int, number: int):
+    def _same_num_in_col(self, col: int, num: int):
         'Returns a bool that indicates if the given number is already in the given column'
+        return num in self._board.get_column(col)
 
-        return number in self._board.get_column(col)
-
-    def _same_num_in_box(self, row: int, col: int, number: int):
+    def _same_num_in_box(self, row: int, col: int, num: int):
         'Returns a bool that indicates if the given number is already in the respective box of the given cell'
-
-        return number in self._board.get_box(row, col)
+        return num in self._board.get_box(row, col)
 
     def _valid_number(self, number: int):
         'Returns a bool that indicates if the given number is valid'
@@ -327,10 +319,6 @@ class PermanencyError(Exception):
     'Exception for attempts to remove a number that is permanent in the game'
     def __init__(self, row, column):
         super().__init__('PermanencyError: Unable to remove the cell. ({}, {}) is permanent in the game.'.format(row,column))
-
-
-
-
 
 
 if __name__ == '__main__':

@@ -29,7 +29,7 @@ class Board():
     def get_cell(self, row: int, column: int):
         'Returns the value of a cell.'
 
-        return self._state[row][column]
+        return self._state[row][column]  # @UndefinedVariable
 
     def get_row(self, row: int):
         'Returns the values of a row.'
@@ -51,7 +51,7 @@ class Board():
     def get_box(self, row: int, column: int):
         'Returns the values of the 3x3 box that the given cell is a member of.'
         values = []
-        for index in self._box_indices(row, column):
+        for index in self._box_indices(row, column):  # @UndefinedVariable
             row_index, column_index = index
             values.append(self._state[row_index][column_index])
 
@@ -59,14 +59,14 @@ class Board():
     
     def add(self, row: int, column: int, number: int):
         'Changes the value of a cell to a certain number.'
-        self._state[row][column] = number
+        self._state[row][column] = number  # @UndefinedVariable
 
     def clear(self, row: int, column: int):
         'Clears the given cell and returns the number that was there.'
 
-        previous_entry = self._state[row][column]
+        previous_entry = self._state[row][column]  # @UndefinedVariable
 
-        self._state[row][column] = 0
+        self._state[row][column] = 0  # @UndefinedVariable
         
         return previous_entry
 
@@ -96,7 +96,7 @@ class Board():
             row_list = map(str, row_list)
             row_list = list(row_list)
             
-            for col_index, row_value in enumerate(row_list):
+            for col_index, row_value in enumerate(row_list):  # @UnusedVariable
                 if col_index == 2 or col_index == 5:
                     row_list[col_index] += ' |'
                     
@@ -121,7 +121,7 @@ class Board():
         'Returns the indices for all the members of the given 3x3 box.'
         indices = []
 
-        row_bounds, column_bounds = self._box_bounds(row, column)
+        row_bounds, column_bounds = self._box_bounds(row, column)  # @UndefinedVariable
         
         for row_index in range(row_bounds[0], row_bounds[1] + 1):
 
@@ -145,35 +145,35 @@ class Board():
 
         box_bounds = []
         
-        if  0 <= row <= 2 and 0 <= column <= 2:
+        if  0 <= row <= 2 and 0 <= column <= 2:  # @UndefinedVariable
             box_bounds = [(0,2),(0,2)]
 
-        elif 0 <= row <= 2 and 3 <= column <= 5:
+        elif 0 <= row <= 2 and 3 <= column <= 5:  # @UndefinedVariable
             box_bounds = [(0,2),(3,5)]
 
-        elif 0 <= row <= 2 and 6 <= column <= 8:
+        elif 0 <= row <= 2 and 6 <= column <= 8:  # @UndefinedVariable
             box_bounds = [(0,2),(6,8)]
 
         # second section
 
-        elif 3 <= row <= 5 and 0 <= column <= 2:
+        elif 3 <= row <= 5 and 0 <= column <= 2:  # @UndefinedVariable
             box_bounds = [(3,5),(0,2)]
 
-        elif 3 <= row <= 5 and 3 <= column <= 5:
+        elif 3 <= row <= 5 and 3 <= column <= 5:  # @UndefinedVariable
             box_bounds = [(3,5),(3,5)]
 
-        elif 3 <= row <= 5 and 6 <= column <= 8:
+        elif 3 <= row <= 5 and 6 <= column <= 8:  # @UndefinedVariable
             box_bounds = [(3,5),(6,8)]
 
         # third section
 
-        elif 6 <= row <= 8 and 0 <= column <= 2:
+        elif 6 <= row <= 8 and 0 <= column <= 2:  # @UndefinedVariable
             box_bounds = [(6,8),(0,2)]
 
-        elif 6 <= row <= 8 and 3 <= column <= 5:
+        elif 6 <= row <= 8 and 3 <= column <= 5:  # @UndefinedVariable
             box_bounds = [(6,8),(3,5)]
 
-        elif 6 <= row <= 8 and 6 <= column <= 8:
+        elif 6 <= row <= 8 and 6 <= column <= 8:  # @UndefinedVariable
             box_bounds = [(6,8),(6,8)]
 
         return box_bounds
